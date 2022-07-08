@@ -7,14 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Xml;
 
 namespace CARGAR_EXCEL
@@ -23,13 +19,13 @@ namespace CARGAR_EXCEL
     {
         public facLabController facLabControler = new facLabController();
         //public FacCpController facLabControler = new FacCpController();
-        
+
         public string fDesde, fHasta, concepto, tipoCobro, tipocomprobante, lugarexpedicion, metodopago33, formadepago, usocfdi, confirmacion, paisresidencia, numtributacion
         , mailenvio, numidentificacion, claveunidad, tipofactoriva, tipofactorret, coditrans, tipofactor, tasatras, codirete, tasarete, relacion, montosoloiva, montoivarete
         , ivadeiva, ivaderet, retderet, conceptoretencion, consecutivoconcepto, claveproductoservicio, valorunitario, importe, descuento, cantidadletra, uuidrel
         , identificador, version, fechapago, monedacpag, tipodecambiocpag, monto, numerooperacion, rfcemisorcuenta, nombrebanco, numerocuentaord, rfcemisorcuentaben, numcuentaben
         , tipocadenapago, certpago, cadenadelpago, sellodelpago, identpag, identdocpago, seriecpag, foliocpag, monedacpagdoc, tipocambiocpag, metododepago, numerodeparcialidad
-        , importeSaldoAnterior, importepago, importesaldoinsoluto, total, subt, ivat, rett, cond, tipoc, seriee, folioe, sfolio, Foliosrelacionados,serier,folior,uuidpagadas,IdentificadorDelDocumentoPagado, ipagado, nparcialidades,folio, MetdodoPago, Dserie, monedascpadgoc, interiorsaldoanterior, isaldoinsoluto, identificaciondpago, folioscpag,k1,k3, norden, tmoneda, idcomprobante, cantidad, descripcion, Tuuid, iddelpago, iipagado, basecalculado, basecalculado2, basecalculado3, impSaldoAnterior, impSaldoInsoluto, fechap;
+        , importeSaldoAnterior, importepago, importesaldoinsoluto, total, subt, ivat, rett, cond, tipoc, seriee, folioe, sfolio, Foliosrelacionados, serier, folior, uuidpagadas, IdentificadorDelDocumentoPagado, ipagado, nparcialidades, folio, MetdodoPago, Dserie, monedascpadgoc, interiorsaldoanterior, isaldoinsoluto, identificaciondpago, folioscpag, k1, k3, norden, tmoneda, idcomprobante, cantidad, descripcion, Tuuid, iddelpago, iipagado, basecalculado, basecalculado2, basecalculado3, impSaldoAnterior, impSaldoInsoluto, fechap, fechaemision;
 
         public bool error = false;
 
@@ -47,7 +43,7 @@ namespace CARGAR_EXCEL
         public decimal importePagos26 = 0;
         public decimal valorunitarios = 0;
 
-       
+
         public double ivaa = 0.16;
         public double isrr = 0.04;
         public decimal totalIva = 0;
@@ -61,7 +57,7 @@ namespace CARGAR_EXCEL
         public string uid = "";
 
 
-        
+
         public int contadorPUE = 0;
         public int contadorPPD = 0;
         public int contadortralix = 0;
@@ -73,8 +69,8 @@ namespace CARGAR_EXCEL
         {
             imgFDesde.Visible = false;
             imgFHasta.Visible = false;
-            lblFact.Text = Request.QueryString["factura"];
-            //lblFact.Text = "40866";
+            //lblFact.Text = Request.QueryString["factura"];
+            lblFact.Text = "40867";
             //foliot = Request.QueryString["factura"];
             if (IsPostBack)
             {
@@ -85,7 +81,7 @@ namespace CARGAR_EXCEL
                 formadepago = txtFormaPago.Text;
                 txtFolio.Text = "";
             }
-          
+
 
             try
             {
@@ -131,8 +127,8 @@ namespace CARGAR_EXCEL
                     }
                 }
             }
-            
-      
+
+
             //DESDE AQUI EMPIZA EL TXT DE PRODUCCION
             DataTable td = facLabControler.detalleFacturas(lblFact.Text);
             Div1.Visible = false;
@@ -152,25 +148,58 @@ namespace CARGAR_EXCEL
                     DateTime dt = DateTime.Parse(row["FechaHoraEmision"].ToString());
                     txtFechaFactura.Text = dt.ToString("yyyy'/'MM'/'dd HH:mm:ss");
 
+                    // 01 - CAMPOS DE LA NUEVA VERSION
+
+                    idcomprobante = row["IdComprobante"].ToString();
+                    seriee = row["Serie"].ToString();
+                    folioe = row["Folio"].ToString();
+                    DateTime dt2 = DateTime.Parse(row["FechaHoraEmision"].ToString());
+                    fechaemision = dt2.ToString("yyyy'/'MM'/'dd HH:mm:ss");
+                    subt = row["Subtotal"].ToString();
+                    total = row["Total"].ToString();
+                    //Metodopago33 lo toma de cpagdoc
+                    txtMoneda.Text = row["Moneda"].ToString();
+                    tipocomprobante = row["TipodeComprobante"].ToString();
+                    lugarexpedicion = row["LugardeExpedición"].ToString();
+                    usocfdi = row["UsoCFDI"].ToString();
+                    if (usocfdi == "P01")
+                    {
+                        usocfdi = "CP01";
+                    }
+                    //Etiqueta tipo documento = FAC
+
+
+                    // 01 - FIN ----------------------------
+
+                    // 02 - CAMPOS DE LA NUEVA VERSION
+                    txtIdCliente.Text = row["IdReceptor"].ToString();
+                    txtRFC.Text = row["RFC"].ToString();
+                    txtCliente.Text = row["Nombre"].ToString();
+                    txtCP.Text = row["CódigoPostal"].ToString();
+                    descripcion = row["Descripcion"].ToString();
+                    //REGIMEN FISCAL 601
+
+                    // 02 - FIN CAMPOS DE LA NUEVA VERSION
+
+
                     sfolio = row["SFolio"].ToString();
 
 
-                    seriee = row["Serie"].ToString();
 
-                    folioe = row["Folio"].ToString();
-                    subt = row["Subtotal"].ToString();
+
+
+
                     ivat = row["TotalImpuestosTrasladados"].ToString();
                     rett = row["TotalImpuestosRetenidos"].ToString();
-                    total = row["Total"].ToString();
+
                     cantidadletra = row["Totalconletra"].ToString();
                     //formadepago = row["FormaDePago"].ToString();
                     cond = row["CondicionesdePago"].ToString();
                     metodopago33 = row["MetodoPago"].ToString();
-                    txtMoneda.Text = row["Moneda"].ToString();
+
                     tipoc = row["Tipodecambio"].ToString();
-                    tipocomprobante = row["TipodeComprobante"].ToString();
-                    lugarexpedicion = row["LugardeExpedición"].ToString();
-                    usocfdi = row["UsoCFDI"].ToString();
+
+
                     confirmacion = row["Confirmación"].ToString();
 
                     //02-------------------------------------------------------------------------------------------------------------------------
@@ -189,7 +218,7 @@ namespace CARGAR_EXCEL
                     txtReferencia.Text = row["Referencia"].ToString();
                     txtMunicipio.Text = row["MunicipioDelegacion"].ToString();
                     txtEstado.Text = row["Estado"].ToString();
-                    txtCP.Text = row["CódigoPostal"].ToString();
+
                     txtFechaPago.Text = row["Fechapago"].ToString();
                     paisresidencia = row["PaísResidenciaFiscal"].ToString();
                     numtributacion = row["NúmeroDeRegistroIdTributacion"].ToString();
@@ -204,6 +233,7 @@ namespace CARGAR_EXCEL
                     txtUnidadMedida.Text = row["ClaveUnidad"].ToString();
                     txtIdConcepto.Text = row["ClaveProductooServicio"].ToString();
                     txtCantidad.Text = row["Cantidad"].ToString();
+                    cantidad = row["Cantidad"].ToString();
                     txtMetodoPago.Text = row["MedotoDePago"].ToString();
 
                     if (concepto == null || concepto.Equals(row["Descripcion"].ToString())) { txtConcepto.Text = row["Descripcion"].ToString(); }
@@ -255,7 +285,7 @@ namespace CARGAR_EXCEL
                         if (detalleIdent2.Rows.Count > 0)
                         {
                             //CPADOC DESDE GP ----------------------
-                            
+
 
                             foreach (DataRow rowIdent2 in detalleIdent2.Rows)
                             {
@@ -278,6 +308,7 @@ namespace CARGAR_EXCEL
                                 else { importesaldoinsoluto = rowIdent2["ImporteSaldoInsoluto"].ToString(); }
                                 numerodeparcialidad = rowIdent2["NumeroDeParcialidad"].ToString();
                                 tipocambiocpag = rowIdent2["TipodeCambiocpagdpc"].ToString();
+                                metodopago33 = rowIdent2["MedotoDePago"].ToString();
                                 DataTable detalleIdentt = facLabControler.getDatosCPAGDOCTRL(identificaciondpago, folioscpag);
                                 if (detalleIdentt.Rows.Count > 0)
                                 {
@@ -408,7 +439,7 @@ namespace CARGAR_EXCEL
                                                             {
                                                                 lugarexpedicion = rowCC["LugarExpedicion"].ToString();
                                                                 //tipocomprobante = rowCC["TipoDeComprobante"].ToString();
-                                                                total = rowCC["Total"].ToString();
+                                                                //total = rowCC["Total"].ToString();
                                                                 monedascpadgoc = rowCC["Moneda"].ToString();
                                                                 formadepago = rowCC["FormaPago"].ToString();
                                                                 if (formadepago == null || formadepago == "99") { formadepago = row["Formadepagocpag"].ToString(); }
@@ -458,7 +489,7 @@ namespace CARGAR_EXCEL
                                                                 {
                                                                     string errors = ex.Message;
                                                                 }
-                                                               
+
                                                                 cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                                       + "|" + iddelpago                                       //2-IdentificadorDelPago
                                                                                                                               //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -591,7 +622,7 @@ namespace CARGAR_EXCEL
                                                         {
                                                             lugarexpedicion = rowCC["LugarExpedicion"].ToString();
                                                             //tipocomprobante = rowCC["TipoDeComprobante"].ToString();
-                                                            total = rowCC["Total"].ToString();
+                                                            //total = rowCC["Total"].ToString();
                                                             monedascpadgoc = rowCC["Moneda"].ToString();
                                                             formadepago = rowCC["FormaPago"].ToString();
                                                             if (formadepago == null || formadepago == "99") { formadepago = row["Formadepagocpag"].ToString(); }
@@ -631,8 +662,8 @@ namespace CARGAR_EXCEL
                                                         }
                                                         if (monedascpadgoc.Trim() == "USD")
                                                         {
-                                                            
-                                                           
+
+
                                                             cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                                   + "|" + iddelpago.Trim()                                      //2-IdentificadorDelPago
                                                                                                                                 //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -665,7 +696,7 @@ namespace CARGAR_EXCEL
                                                               + "|" + basecalculado.Trim()                                //11-ImportePagado                                                  
                                                               + "|" + basecalculado3.Trim()                                            //12 ImporteSaldoInsoluto
                                                               + "| \r\n");
-                                                            
+
                                                         }
 
 
@@ -683,15 +714,15 @@ namespace CARGAR_EXCEL
                                                 }
 
                                             }
-                                            else 
+                                            else
                                             {
-                                                
+
                                                 DataTable invoiceresult = facLabControler.getDatosInvoice(k3);
                                                 if (invoiceresult.Rows.Count > 0)
                                                 {
                                                     foreach (DataRow rowInvoice in invoiceresult.Rows)
                                                     {
-                                                        
+
                                                         norden = rowInvoice["ord_hdrnumber"].ToString();
                                                         DataTable segmentoresult = facLabControler.getDatosSegmentos(norden);
                                                         foreach (DataRow seg in segmentoresult.Rows)
@@ -769,7 +800,7 @@ namespace CARGAR_EXCEL
                                                                         {
                                                                             lugarexpedicion = rowCC["LugarExpedicion"].ToString();
                                                                             //tipocomprobante = rowCC["TipoDeComprobante"].ToString();
-                                                                            total = rowCC["Total"].ToString();
+                                                                            //total = rowCC["Total"].ToString();
                                                                             monedascpadgoc = rowCC["Moneda"].ToString();
                                                                             formadepago = rowCC["FormaPago"].ToString();
                                                                             if (formadepago == null || formadepago == "99") { formadepago = row["Formadepagocpag"].ToString(); }
@@ -808,8 +839,8 @@ namespace CARGAR_EXCEL
                                                                         }
                                                                         if (monedascpadgoc.Trim() == "USD")
                                                                         {
-                                                                           
-                                                                           
+
+
                                                                             cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                                               + "|" + iddelpago.Trim()                                       //2-IdentificadorDelPago
                                                                                                                                              //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -888,7 +919,7 @@ namespace CARGAR_EXCEL
                                                 }
                                             }
                                             //ME FALTA ESTA DE PROBAR Y GENERAR TXT
-                                          
+
 
                                         }
 
@@ -899,10 +930,10 @@ namespace CARGAR_EXCEL
 
                                     }
                                 }
-                                
+
                             }
                             decimal totald = importePagos2 + importePagos22 + importePagos7 + importePagos4 + importePagos23 + importePagos24;
-                            txtTotal.Text = totald.ToString() ;
+                            txtTotal.Text = totald.ToString();
 
                             //AQUI TERMINA GP ---------------------
 
@@ -1254,7 +1285,7 @@ namespace CARGAR_EXCEL
                                         lugarexpedicion = rowCC["LugarExpedicion"].ToString();
                                         //tipocomprobante = rowCC["TipoDeComprobante"].ToString();
                                         //tipodecambiocpag = rowCC["TipoCambio"].ToString();
-                                        total = rowCC["Total"].ToString();
+                                        //total = rowCC["Total"].ToString();
                                         monedascpadgoc = rowCC["Moneda"].ToString();
                                         //formadepago = rowCC["FormaPago"].ToString();
                                         if (formadepago == null || formadepago == "99") { formadepago = row["Formadepagocpag"].ToString(); }
@@ -1350,7 +1381,7 @@ namespace CARGAR_EXCEL
                                                         {
 
 
-                                                           
+
                                                             cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                               + "|" + identpag                                       //2-IdentificadorDelPago
                                                                                                                      //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -1614,7 +1645,7 @@ namespace CARGAR_EXCEL
                                                                 {
                                                                     lugarexpedicion = rowCC["LugarExpedicion"].ToString();
                                                                     //tipocomprobante = rowCC["TipoDeComprobante"].ToString();
-                                                                    total = rowCC["Total"].ToString();
+                                                                    //total = rowCC["Total"].ToString();
                                                                     monedascpadgoc = rowCC["Moneda"].ToString();
                                                                     formadepago = rowCC["FormaPago"].ToString();
                                                                     if (formadepago == null || formadepago == "99") { formadepago = row["Formadepagocpag"].ToString(); }
@@ -1663,7 +1694,7 @@ namespace CARGAR_EXCEL
                                                                     {
                                                                         string errors = ex.Message;
                                                                     }
-                                                                    
+
                                                                     cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                                           + "|" + iddelpago                                       //2-IdentificadorDelPago
                                                                                                                                   //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -1796,7 +1827,7 @@ namespace CARGAR_EXCEL
                                                             {
                                                                 lugarexpedicion = rowCC["LugarExpedicion"].ToString();
                                                                 //tipocomprobante = rowCC["TipoDeComprobante"].ToString();
-                                                                total = rowCC["Total"].ToString();
+                                                                //total = rowCC["Total"].ToString();
                                                                 monedascpadgoc = rowCC["Moneda"].ToString();
                                                                 formadepago = rowCC["FormaPago"].ToString();
                                                                 if (formadepago == null || formadepago == "99") { formadepago = row["Formadepagocpag"].ToString(); }
@@ -1845,7 +1876,7 @@ namespace CARGAR_EXCEL
                                                                 {
                                                                     string errors = ex.Message;
                                                                 }
-                                                                
+
                                                                 cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                                       + "|" + iddelpago.Trim()                                      //2-IdentificadorDelPago
                                                                                                                                     //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -1894,9 +1925,9 @@ namespace CARGAR_EXCEL
                                                     }
 
                                                 }
-                                              
+
                                                 //ME FALTA ESTA DE PROBAR Y GENERAR TXT
-                                                else 
+                                                else
                                                 {
                                                     DataTable invoiceresult = facLabControler.getDatosInvoice(k3);
                                                     if (invoiceresult.Rows.Count > 0)
@@ -2029,7 +2060,7 @@ namespace CARGAR_EXCEL
                                                                                 {
                                                                                     string errors = ex.Message;
                                                                                 }
-                                                                               
+
                                                                                 cpagdoc = cpagdoc + ("CPAGDOC"                           //1-Tipo De Registro
                                                                                   + "|" + iddelpago.Trim()                                       //2-IdentificadorDelPago
                                                                                                                                                  //+ "|" + rowIdent["IdentificadorDelDocumentoPagado"].ToString()                            //3-IdentificadorDelDocumentoPagado                                              
@@ -2072,7 +2103,7 @@ namespace CARGAR_EXCEL
                                                     }
 
                                                 }
-                                                 if (uid == "" && serieinvoice == "TDRA")
+                                                if (uid == "" && serieinvoice == "TDRA")
                                                 {
                                                     var request23 = (HttpWebRequest)WebRequest.Create("https://canal1.xsa.com.mx:9050/bf2e1036-ba47-49a0-8cd9-e04b36d5afd4/cfdis?folioEspecifico=" + folio + "&serie=" + "SAEM");
                                                     var response23 = (HttpWebResponse)request23.GetResponse();
@@ -2447,7 +2478,7 @@ namespace CARGAR_EXCEL
                             }
                         }
 
-                        
+
                     }
 
 
@@ -2479,7 +2510,7 @@ namespace CARGAR_EXCEL
                         else
                         {
 
-                            
+
                             txtFechaIniOP.Text = uuidpagadas;
                             FolioUUIDTxt.Text = Foliosrelacionados;
 
@@ -2490,7 +2521,7 @@ namespace CARGAR_EXCEL
 
 
                             txtTipoCobro.Text = "Complemento Pago";
-                           //generaTXT();
+                            generaTXT2();
                         }
                     }
 
@@ -2498,18 +2529,382 @@ namespace CARGAR_EXCEL
                     //OTROS-------------------------------------------------------------------------------------------------------------------------
 
                     // creamos el FolioUUID
-                    
-                   
+
+
 
                 }
             }
-            
+
 
             //AQUI TERMINA TXT PRODUCCIION
 
         }
 
+        public void generaTXT2()
+        {
+            try
+            { //try TLS 1.3
+                ServicePointManager.SecurityProtocol = (SecurityProtocolType)12288
+                                                     | (SecurityProtocolType)3072
+                                                     | (SecurityProtocolType)768
+                                                     | SecurityProtocolType.Tls;
+            }
+            catch (NotSupportedException)
+            {
+                try
+                { //try TLS 1.2
+                    ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072
+                                                         | (SecurityProtocolType)768
+                                                         | SecurityProtocolType.Tls;
+                }
+                catch (NotSupportedException)
+                {
+                    try
+                    { //try TLS 1.1
+                        ServicePointManager.SecurityProtocol = (SecurityProtocolType)768
+                                                             | SecurityProtocolType.Tls;
+                    }
+                    catch (NotSupportedException)
+                    { //TLS 1.0
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
+                    }
+                }
+            }
+            txtConcepto.Text = validaCampo(txtConcepto.Text.Trim());
 
+            string path = System.Web.Configuration.WebConfigurationManager.AppSettings["dir"] + lblFact.Text + ".txt";
+            using (System.IO.StreamWriter escritor = new System.IO.StreamWriter(path))
+
+
+
+            {
+                string f1 = txtFechaDesde.Text;
+                string factura = txtFolio.Text;
+
+
+                //----------------------------------------Seccion De Datos Generales del CFDI-----------------------------------------------------------------------------------------
+                //string f01 = "01"   // LISTO
+
+                //01 INFORMACION GENERAL DEL CFDI (1:1)
+                if (formadepago.Trim() != "02")
+                {
+                    escritor.WriteLine(
+                    "01"                                                //1.-Tipo De Registro
+                    + "|" + folioe.Trim()  //2.- IdComprobante
+                    + "|" + seriee.Trim()         //3. Serie
+                    + "|" + folioe.Trim()         //4.  
+                    + "|" + fechaemision.Trim()
+                    + "|" + subt.Trim()
+                    + "|"
+                    + "|"
+                    + "|"
+                    + "|" + total.Trim()
+                    + "|"
+                    + "|" + "03"
+                    + "|"
+                    + "|" + metodopago33.Trim() // este viene de CPADOC
+                    + "|" + txtMoneda.Text.Trim()
+                    + "|"
+                    + "|" + tipocomprobante.Trim()
+                    + "|" + lugarexpedicion.Trim()
+                    + "|" + usocfdi.Trim()
+                    + "|"
+                    + "|" + "FAC"
+                    + "|"
+                    + "|"
+                    + "|"
+                    );
+                    escrituraFactura += "01"                                                //1.-Tipo De Registro
+                    + "|" + folioe.Trim()  //2.- IdComprobante
+                    + "|" + seriee.Trim()         //3. Serie
+                    + "|" + folioe.Trim()         //4.  
+                    + "|" + fechaemision.Trim()
+                    + "|" + subt.Trim()
+                    + "|"
+                    + "|"
+                    + "|"
+                    + "|" + total.Trim()
+                    + "|"
+                    + "|" + "03"
+                    + "|"
+                    + "|" + metodopago33.Trim() // este viene de CPADOC
+                    + "|" + txtMoneda.Text.Trim()
+                    + "|"
+                    + "|" + tipocomprobante.Trim()
+                    + "|" + lugarexpedicion.Trim()
+                    + "|" + usocfdi.Trim()
+                    + "|"
+                    + "|" + "FAC"
+                    + "|"
+                    + "|"
+                    + "|";
+                }
+                else
+                {
+                    escritor.WriteLine(
+                   "01"                                                //1.-Tipo De Registro
+                   + "|" + folioe.Trim()  //2.- IdComprobante
+                   + "|" + seriee.Trim()         //3. Serie
+                   + "|" + folioe.Trim()         //4.  
+                   + "|" + fechaemision.Trim()
+                   + "|" + subt.Trim()
+                   + "|"
+                   + "|"
+                   + "|"
+                   + "|" + total.Trim()
+                   + "|"
+                   + "|" + "03"
+                   + "|"
+                   + "|" + metodopago33.Trim() // este viene de CPADOC
+                   + "|" + txtMoneda.Text.Trim()
+                   + "|"
+                   + "|" + tipocomprobante.Trim()
+                   + "|" + lugarexpedicion.Trim()
+                   + "|" + usocfdi.Trim()
+                   + "|"
+                   + "|" + "FAC"
+                   + "|"
+                   + "|"
+                   + "|"
+                   );
+                    escrituraFactura += "01"                                                //1.-Tipo De Registro
+                    + "|" + folioe.Trim()  //2.- IdComprobante
+                    + "|" + seriee.Trim()         //3. Serie
+                    + "|" + folioe.Trim()         //4.  
+                    + "|" + fechaemision.Trim()
+                    + "|" + subt.Trim()
+                    + "|"
+                    + "|"
+                    + "|"
+                    + "|" + total.Trim()
+                    + "|"
+                    + "|" + "03"
+                    + "|"
+                    + "|" + metodopago33.Trim() // este viene de CPADOC
+                    + "|" + txtMoneda.Text.Trim()
+                    + "|"
+                    + "|" + tipocomprobante.Trim()
+                    + "|" + lugarexpedicion.Trim()
+                    + "|" + usocfdi.Trim()
+                    + "|"
+                    + "|" + "FAC"
+                    + "|"
+                    + "|"
+                    + "|";
+                }
+                //----------------------------------------Seccion de los datos del receptor del CFDI -------------------------------------------------------------------------------------
+
+                //02 INFORMACION DEL RECEPTOR (1:1)
+                if (monedascpadgoc.Trim() == "USD")
+                {
+                    escritor.WriteLine(
+                       "02"                                                   //1-Tipo De Registro
+                       + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                       + "|" + txtRFC.Text.Trim()                                //3-RFC
+                       + "|" + txtCliente.Text.Trim()                         //4-Nombre
+                       + "|"                             //5-Pais
+                       + "|"                           //6-Calle
+                       + "|"                           //7-Numero Exterior
+                       + "|"                          //8-Numero Interior
+                       + "|"                         //9-Colonia
+                       + "|"                       //10-Localidad
+                       + "|"                      //11-Referencia
+                       + "|"                       //12-Municio/Delegacion
+                       + "|"                           //13-EStado
+                       + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
+                       + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                       + "|"                                   //16-Numero de Registro de ID Tributacion 
+                       + "|"                                     //17-Correo de envio                                                    
+                       + "|" + "601"
+                       + "|"      //Fin Del Registro 
+                       );
+
+                    escrituraFactura += "\\n02"                                                   //1-Tipo De Registro
+                      + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                       + "|" + txtRFC.Text.Trim()                                //3-RFC
+                       + "|" + txtCliente.Text.Trim()                         //4-Nombre
+                       + "|"                             //5-Pais
+                       + "|"                           //6-Calle
+                       + "|"                           //7-Numero Exterior
+                       + "|"                          //8-Numero Interior
+                       + "|"                         //9-Colonia
+                       + "|"                       //10-Localidad
+                       + "|"                      //11-Referencia
+                       + "|"                       //12-Municio/Delegacion
+                       + "|"                           //13-EStado
+                       + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
+                       + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                       + "|"                                   //16-Numero de Registro de ID Tributacion 
+                       + "|"                                     //17-Correo de envio                                                    
+                       + "|" + "601"
+                       + "|";
+
+                }
+                else
+                {
+
+                    escritor.WriteLine(
+                        "02"                                                   //1-Tipo De Registro
+                        + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                        + "|" + txtRFC.Text.Trim()                                //3-RFC
+                        + "|" + txtCliente.Text.Trim()                         //4-Nombre
+                        + "|"                             //5-Pais
+                        + "|"                           //6-Calle
+                        + "|"                           //7-Numero Exterior
+                        + "|"                          //8-Numero Interior
+                        + "|"                         //9-Colonia
+                        + "|"                       //10-Localidad
+                        + "|"                      //11-Referencia
+                        + "|"                       //12-Municio/Delegacion
+                        + "|"                           //13-EStado
+                        + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
+                        + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                        + "|"                                   //16-Numero de Registro de ID Tributacion 
+                        + "|"                                     //17-Correo de envio                                                    
+                        + "|" + "601"
+                        + "|"      //Fin Del Registro 
+                        );
+
+                    escrituraFactura += "\\n02"                                                   //1-Tipo De Registro
+                      + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                       + "|" + txtRFC.Text.Trim()                                //3-RFC
+                       + "|" + txtCliente.Text.Trim()                         //4-Nombre
+                       + "|"                             //5-Pais
+                       + "|"                           //6-Calle
+                       + "|"                           //7-Numero Exterior
+                       + "|"                          //8-Numero Interior
+                       + "|"                         //9-Colonia
+                       + "|"                       //10-Localidad
+                       + "|"                      //11-Referencia
+                       + "|"                       //12-Municio/Delegacion
+                       + "|"                           //13-EStado
+                       + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
+                       + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                       + "|"                                   //16-Numero de Registro de ID Tributacion 
+                       + "|"                                     //17-Correo de envio                                                    
+                       + "|" + "601"
+                       + "|";
+
+                }
+                escritor.WriteLine(
+               "04"                                                   //1-Tipo De Registro
+              + "|" + consecutivoconcepto.Trim()                       //2-Id Receptor
+              + "|" + claveproductoservicio.Trim()                                //3-RFC
+              + "|"                          //4-Nombre
+              + "|" + cantidad.Trim()                           //5-Pais
+              + "|" + claveunidad.Trim()                            //6-Calle
+              + "|"                             //7-Numero Exterior
+              + "|" + descripcion.Trim()                            //8-Numero Interior
+              + "|" + "0"                         //9-Colonia
+              + "|" + "0"                        //10-Localidad
+              + "|"                        //11-Referencia
+              + "|"                         //12-Municio/Delegacion
+              + "|" + "02"                          //13-EStado
+              + "|"
+              );
+
+
+                escrituraFactura += "\\n04"                                                   //1-Tipo De Registro
+                + "|" + consecutivoconcepto.Trim()                       //2-Id Receptor
+              + "|" + claveproductoservicio.Trim()                                //3-RFC
+              + "|"                          //4-Nombre
+              + "|" + cantidad.Trim()                           //5-Pais
+              + "|" + claveunidad.Trim()                            //6-Calle
+              + "|"                             //7-Numero Exterior
+              + "|" + descripcion.Trim()                            //8-Numero Interior
+              + "|" + "0"                         //9-Colonia
+              + "|" + "0"                        //10-Localidad
+              + "|"                        //11-Referencia
+              + "|"                         //12-Municio/Delegacion
+              + "|" + "02"                          //13-EStado
+              + "|";
+                //CPAG20 (1:1)
+                escritor.WriteLine(
+                "CPAG20"                         //1-Tipo De Registro
+                + "|" + "2.0"                    //2-Version
+                + "|"                               //Fin Del Registro
+                );
+
+                escrituraFactura += "CPAG20"    //1-Tipo De Registro
+                + "|" + "2.0"                   //2-Version  
+                + "|";
+
+                escritor.WriteLine(
+                "CPAG20TOT"                         //1-Tipo De Registro
+                + "|"                               //2-TotalRetencionesIVA
+                + "|"                               //3-TotalRetencionesISR                                              
+                + "|"                               //4-TotalRetencionesIEPS
+                + "|"                               //5-TotalTrasladosBaseIVA16
+                + "|"                               //6-TotalTrasladosImpuestoIVA16
+                + "|"                               //7-TotalTrasladosBaseIVA8
+                + "|"                               //8-TotalTrasladosImpuestoIVA8
+                + "|"                               //9-TotalTrasladosBaseIVA0
+                + "|"                               //10-TotalTrasladosImpuestoIVA0
+                + "|"                               //11-TotalTrasladosBaseIVAExento
+                 + "|" + txtTotal.Text.Trim()                       //12-MontoTotalPagos                                                                                                 
+                 + "|"                               //Fin Del Registro
+                );
+
+                escrituraFactura += "CPAG20TOT"    //1-Tipo De Registro
+                + "|"                               //2-TotalRetencionesIVA
+                + "|"                               //3-TotalRetencionesISR                                              
+                + "|"                               //4-TotalRetencionesIEPS
+                + "|"                               //5-TotalTrasladosBaseIVA16
+                + "|"                               //6-TotalTrasladosImpuestoIVA16
+                + "|"                               //7-TotalTrasladosBaseIVA8
+                + "|"                               //8-TotalTrasladosImpuestoIVA8
+                + "|"                               //9-TotalTrasladosBaseIVA0
+                + "|"                               //10-TotalTrasladosImpuestoIVA0
+                + "|"                               //11-TotalTrasladosBaseIVAExento
+                + "|" + txtTotal.Text.Trim()                       //12-MontoTotalPagos  
+                + "|";
+
+                //CPAG20PAGO COMPLEMENTO DE PAGO (1:N)
+                escritor.WriteLine(
+                "CPAG20PAGO"                                           //1-Tipo De Registro
+                + "|" + folioe.Trim()                                  //2-Identificador                                             
+                + "|" + fechapago.Trim()                                      //3-Fechapago
+                + "|" + formadepago.Trim()                              //4-Formadepagocpag
+                + "|" + monedacpag.Trim()                                     //5-Monedacpag
+                + "|" + tipodecambiocpag.Trim()                               //6-TipoDecambiocpag
+                + "|" + txtTotal.Text.Trim()                                  //8-Monto
+                + "|" + numerooperacion.Trim()                                //9-NumeroOperacion
+                + "|" + txtRFCbancoEmisor.Text.Trim()                         //10-RFCEmisorCuentaBeneficiario
+                + "|" + txtBancoEmisor.Text.Trim()                            //11-NombreDelBanco                                                                                            
+                + "|" + txtCuentaPago.Text.Trim()                             //12-NumeroCuentaOrdenante
+                + "|" + rfcemisorcuentaben.Trim()                             //13-RFCEmisorCuentaBeneficiario
+                + "|" + numcuentaben.Trim()                                   //14-NumCuentaBeneficiario
+                + "|" + tipocadenapago.Trim()                                 //15-TipoCadenaPago                                               
+                + "|" + certpago.Trim()                                       //16-CertificadoPago
+                + "|" + cadenadelpago.Trim()                                  //17-CadenaDePago
+                + "|" + sellodelpago.Trim()                                   //Fin Del Registro
+                + "|"
+                );
+
+                escrituraFactura += "CPAG20PAGO"                      //1-Tipo De Registro
+                + "|" + folioe.Trim()                                  //2-Identificador                                             
+                + "|" + fechapago.Trim()                                      //3-Fechapago
+                + "|" + formadepago.Trim()                              //4-Formadepagocpag
+                + "|" + monedacpag.Trim()                                     //5-Monedacpag
+                + "|" + tipodecambiocpag.Trim()                               //6-TipoDecambiocpag
+                + "|" + txtTotal.Text.Trim()                                  //8-Monto
+                + "|" + numerooperacion.Trim()                                //9-NumeroOperacion
+                + "|" + txtRFCbancoEmisor.Text.Trim()                         //10-RFCEmisorCuentaBeneficiario
+                + "|" + txtBancoEmisor.Text.Trim()                            //11-NombreDelBanco                                                                                            
+                + "|" + txtCuentaPago.Text.Trim()                             //12-NumeroCuentaOrdenante
+                + "|" + rfcemisorcuentaben.Trim()                             //13-RFCEmisorCuentaBeneficiario
+                + "|" + numcuentaben.Trim()                                   //14-NumCuentaBeneficiario
+                + "|" + tipocadenapago.Trim()                                 //15-TipoCadenaPago                                               
+                + "|" + certpago.Trim()                                       //16-CertificadoPago
+                + "|" + cadenadelpago.Trim()                                  //17-CadenaDePago
+                + "|" + sellodelpago.Trim()                                   //Fin Del Registro
+                + "|";
+
+                //----------------------------------------Seccion de detalles del complemento de pago -------------------------------------------------------------------
+
+
+            }
+        }
         public void generaTXT()
         {
             try
@@ -2553,101 +2948,114 @@ namespace CARGAR_EXCEL
 
 
                 //----------------------------------------Seccion De Datos Generales del CFDI-----------------------------------------------------------------------------------------
+                //string f01 = "01"   // LISTO
 
                 //01 INFORMACION GENERAL DEL CFDI (1:1)
                 if (formadepago.Trim() != "02")
                 {
                     escritor.WriteLine(
                     "01"                                                //1.-Tipo De Registro
-                    + "|" + sfolio                                      //2-ID Comprobante
-                    + "|" + seriee                                      //3-Serie
-                    + "|" + folioe                                      //4-Foliio 
-                    + "|" + txtFechaFactura.Text.Trim()                 //5-Fecha y Hora De Emision
-                    + "|" + subt                                        //6-Subtotal
-                    + "|" + ivat                                        //7-Total Impuestos Trasladados
-                    + "|" + rett                                        //8-Total Impuestos Retenidos
-                    + "|"                                               //9-Descuentos
-                    + "|" + "0"                                       //10-Total
-                    + "|" + cantidadletra.Trim()                        //11-Total Con Letra
-                    + "|"                         //12-Forma De Pago
-                    + "|" + cond                                        //13-Condiciones De Pago
-                    + "|"                                 //14-Metodo de Pago
-                    + "|" + txtMoneda.Text.Trim()                       //15-Moneda
-                    + "|" + tipoc                                       //16-Tipo De Cambio
-                    + "|" + tipocomprobante                             //17-Tipo De Comprobante
-                    + "|" + lugarexpedicion                             //18-Lugar De Expedicion                                        
-                    + "|" + usocfdi                                     //19-Uso CFDI
-                    + "|" + confirmacion                                //20-Confirmacion
+                    + "|" + idcomprobante.Trim()  //2.- IdComprobante
+                    + "|" + seriee.Trim()         //3. Serie
+                    + "|" + folioe.Trim()         //4.  
+                    + "|" + fechaemision.Trim()
+                    + "|" + subt.Trim()
+                    + "|"
+                    + "|"
+                    + "|"
+                    + "|" + total.Trim()
+                    + "|"
+                    + "|" + "03"
+                    + "|"
+                    + "|" + metodopago33 // este viene de CPADOC
+                    + "|" + txtMoneda.Text
+                    + "|"
+                    + "|" + tipocomprobante
+                    + "|" + lugarexpedicion
+                    + "|" + usocfdi
+                    + "|"
+                    + "|" + "FAC"
+                    + "|"
+                    + "|"
                     + "|"
                     );
                     escrituraFactura += "01"                                                //1.-Tipo De Registro
-                    + "|" + sfolio                                      //2-ID Comprobante
-                    + "|" + seriee                                      //3-Serie
-                    + "|" + folioe                                      //4-Foliio 
-                    + "|" + txtFechaFactura.Text.Trim()                 //5-Fecha y Hora De Emision
-                    + "|" + subt                                        //6-Subtotal
-                    + "|" + ivat                                        //7-Total Impuestos Trasladados
-                    + "|" + rett                                        //8-Total Impuestos Retenidos
-                    + "|"                                               //9-Descuentos
-                    + "|" + "0"                                       //10-Total
-                    + "|" + cantidadletra.Trim()                        //11-Total Con Letra
-                    + "|"                        //12-Forma De Pago
-                    + "|" + cond                                        //13-Condiciones De Pago
-                    + "|"                                 //14-Metodo de Pago
-                    + "|" + txtMoneda.Text.Trim()                       //15-Moneda
-                    + "|" + tipoc                                       //16-Tipo De Cambio
-                    + "|" + tipocomprobante                             //17-Tipo De Comprobante
-                    + "|" + lugarexpedicion                             //18-Lugar De Expedicion                                        
-                    + "|" + usocfdi                                     //19-Uso CFDI
-                    + "|" + confirmacion                                //20-Confirmacion
+                    + "|" + idcomprobante.Trim()  //2.- IdComprobante
+                    + "|" + seriee.Trim()         //3. Serie
+                    + "|" + folioe.Trim()         //4.  
+                    + "|" + fechaemision.Trim()
+                    + "|" + subt.Trim()
+                    + "|"
+                    + "|"
+                    + "|"
+                    + "|" + total.Trim()
+                    + "|"
+                    + "|" + "03"
+                    + "|"
+                    + "|" + metodopago33 // este viene de CPADOC
+                    + "|" + txtMoneda.Text
+                    + "|"
+                    + "|" + tipocomprobante
+                    + "|" + lugarexpedicion
+                    + "|" + usocfdi
+                    + "|"
+                    + "|" + "FAC"
+                    + "|"
+                    + "|"
                     + "|";
                 }
                 else
                 {
                     escritor.WriteLine(
-                    "01"                                                //1.-Tipo De Registro
-                    + "|" + sfolio                                      //2-ID Comprobante
-                    + "|" + seriee                                      //3-Serie
-                    + "|" + folioe                                      //4-Foliio 
-                    + "|" + txtFechaFactura.Text.Trim()                 //5-Fecha y Hora De Emision
-                    + "|" + subt                                        //6-Subtotal
-                    + "|" + ivat                                        //7-Total Impuestos Trasladados
-                    + "|" + rett                                        //8-Total Impuestos Retenidos
-                    + "|"                                               //9-Descuentos
-                    + "|" + "0"                                       //10-Total
-                    + "|" + cantidadletra.Trim()                        //11-Total Con Letra
-                    + "|"                      //12-Forma De Pago
-                    + "|" + cond                                        //13-Condiciones De Pago
-                    + "|"                                 //14-Metodo de Pago
-                    + "|" + txtMoneda.Text.Trim()                       //15-Moneda
-                    + "|" + tipoc                                       //16-Tipo De Cambio
-                    + "|" + tipocomprobante                             //17-Tipo De Comprobante
-                    + "|" + lugarexpedicion                             //18-Lugar De Expedicion                                        
-                    + "|" + usocfdi                                     //19-Uso CFDI
-                    + "|" + confirmacion                                //20-Confirmacion
-                    + "|"
-                    );
+                   "01"                                                //1.-Tipo De Registro
+                   + "|" + idcomprobante.Trim()  //2.- IdComprobante
+                   + "|" + seriee.Trim()         //3. Serie
+                   + "|" + folioe.Trim()         //4.  
+                   + "|" + fechaemision.Trim()
+                   + "|" + subt.Trim()
+                   + "|"
+                   + "|"
+                   + "|"
+                   + "|" + total.Trim()
+                   + "|"
+                   + "|" + "03"
+                   + "|"
+                   + "|" + metodopago33 // este viene de CPADOC
+                   + "|" + txtMoneda.Text
+                   + "|"
+                   + "|" + tipocomprobante
+                   + "|" + lugarexpedicion
+                   + "|" + usocfdi
+                   + "|"
+                   + "|" + "FAC"
+                   + "|"
+                   + "|"
+                   + "|"
+                   );
                     escrituraFactura += "01"                                                //1.-Tipo De Registro
-                   + "|" + sfolio                                      //2-ID Comprobante
-                   + "|" + seriee                                      //3-Serie
-                   + "|" + folioe                                      //4-Foliio 
-                   + "|" + txtFechaFactura.Text.Trim()                 //5-Fecha y Hora De Emision
-                   + "|" + subt                                        //6-Subtotal
-                   + "|" + ivat                                        //7-Total Impuestos Trasladados
-                   + "|" + rett                                        //8-Total Impuestos Retenidos
-                   + "|"                                               //9-Descuentos
-                   + "|" + "0"                                       //10-Total
-                   + "|" + cantidadletra.Trim()                        //11-Total Con Letra
-                   + "|"                          //12-Forma De Pago
-                   + "|" + cond                                        //13-Condiciones De Pago
-                   + "|"                                 //14-Metodo de Pago
-                   + "|" + txtMoneda.Text.Trim()                       //15-Moneda
-                   + "|" + tipoc                                       //16-Tipo De Cambio
-                   + "|" + tipocomprobante                             //17-Tipo De Comprobante
-                   + "|" + lugarexpedicion                             //18-Lugar De Expedicion                                        
-                   + "|" + usocfdi                                     //19-Uso CFDI
-                   + "|" + confirmacion                                //20-Confirmacion
-                   + "|";
+                    + "|" + idcomprobante.Trim()  //2.- IdComprobante
+                    + "|" + seriee.Trim()         //3. Serie
+                    + "|" + folioe.Trim()         //4.  
+                    + "|" + fechaemision.Trim()
+                    + "|" + subt.Trim()
+                    + "|"
+                    + "|"
+                    + "|"
+                    + "|" + total.Trim()
+                    + "|"
+                    + "|" + "03"
+                    + "|"
+                    + "|" + metodopago33 // este viene de CPADOC
+                    + "|" + txtMoneda.Text
+                    + "|"
+                    + "|" + tipocomprobante
+                    + "|" + lugarexpedicion
+                    + "|" + usocfdi
+                    + "|"
+                    + "|" + "FAC"
+                    + "|"
+                    + "|"
+                    + "|";
                 }
                 //----------------------------------------Seccion de los datos del receptor del CFDI -------------------------------------------------------------------------------------
 
@@ -2659,39 +3067,41 @@ namespace CARGAR_EXCEL
                        + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
                        + "|" + txtRFC.Text.Trim()                                //3-RFC
                        + "|" + txtCliente.Text.Trim()                         //4-Nombre
-                       + "|" + txtPaís.Text.Trim()                            //5-Pais
-                       + "|" + txtCalle.Text.Trim()                           //6-Calle
-                       + "|" + txtNoExt.Text.Trim()                           //7-Numero Exterior
-                       + "|" + txtNoInt.Text.Trim()                           //8-Numero Interior
-                       + "|" + txtColonia.Text.Trim()                         //9-Colonia
-                       + "|" + txtLocalidad.Text.Trim()                       //10-Localidad
-                       + "|" + txtReferencia.Text.Trim()                      //11-Referencia
-                       + "|" + txtMunicipio.Text.Trim()                       //12-Municio/Delegacion
-                       + "|" + txtEstado.Text.Trim()                          //13-EStado
+                       + "|"                             //5-Pais
+                       + "|"                           //6-Calle
+                       + "|"                           //7-Numero Exterior
+                       + "|"                          //8-Numero Interior
+                       + "|"                         //9-Colonia
+                       + "|"                       //10-Localidad
+                       + "|"                      //11-Referencia
+                       + "|"                       //12-Municio/Delegacion
+                       + "|"                           //13-EStado
                        + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
                        + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
                        + "|"                                   //16-Numero de Registro de ID Tributacion 
-                       + "|" + mailenvio                                      //17-Correo de envio                                                    
-                       + "|"                                                  //Fin Del Registro 
+                       + "|"                                     //17-Correo de envio                                                    
+                       + "|" + "601"
+                       + "|"      //Fin Del Registro 
                        );
 
                     escrituraFactura += "\\n02"                                                   //1-Tipo De Registro
-                       + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                      + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
                        + "|" + txtRFC.Text.Trim()                                //3-RFC
                        + "|" + txtCliente.Text.Trim()                         //4-Nombre
-                       + "|" + txtPaís.Text.Trim()                            //5-Pais
-                       + "|" + txtCalle.Text.Trim()                           //6-Calle
-                       + "|" + txtNoExt.Text.Trim()                           //7-Numero Exterior
-                       + "|" + txtNoInt.Text.Trim()                           //8-Numero Interior
-                       + "|" + txtColonia.Text.Trim()                         //9-Colonia
-                       + "|" + txtLocalidad.Text.Trim()                       //10-Localidad
-                       + "|" + txtReferencia.Text.Trim()                      //11-Referencia
-                       + "|" + txtMunicipio.Text.Trim()                       //12-Municio/Delegacion
-                       + "|" + txtEstado.Text.Trim()                          //13-EStado
+                       + "|"                             //5-Pais
+                       + "|"                           //6-Calle
+                       + "|"                           //7-Numero Exterior
+                       + "|"                          //8-Numero Interior
+                       + "|"                         //9-Colonia
+                       + "|"                       //10-Localidad
+                       + "|"                      //11-Referencia
+                       + "|"                       //12-Municio/Delegacion
+                       + "|"                           //13-EStado
                        + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
-                       + "|"                                          // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                       + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
                        + "|"                                   //16-Numero de Registro de ID Tributacion 
-                       + "|" + mailenvio                                      //17-Correo de envio                                                    
+                       + "|"                                     //17-Correo de envio                                                    
+                       + "|" + "601"
                        + "|";
 
                 }
@@ -2699,44 +3109,46 @@ namespace CARGAR_EXCEL
                 {
 
                     escritor.WriteLine(
-                    "02"                                                   //1-Tipo De Registro
-                    + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
-                    + "|" + txtRFC.Text.Trim()                             //3-RFC
-                    + "|" + txtCliente.Text.Trim()                         //4-Nombre
-                    + "|" + txtPaís.Text.Trim()                            //5-Pais
-                    + "|" + txtCalle.Text.Trim()                           //6-Calle
-                    + "|" + txtNoExt.Text.Trim()                           //7-Numero Exterior
-                    + "|" + txtNoInt.Text.Trim()                           //8-Numero Interior
-                    + "|" + txtColonia.Text.Trim()                         //9-Colonia
-                    + "|" + txtLocalidad.Text.Trim()                       //10-Localidad
-                    + "|" + txtReferencia.Text.Trim()                      //11-Referencia
-                    + "|" + txtMunicipio.Text.Trim()                       //12-Municio/Delegacion
-                    + "|" + txtEstado.Text.Trim()                          //13-EStado
-                    + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
-                    + "|" + "" // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
-                    + "|" + numtributacion                                 //16-Numero de Registro de ID Tributacion 
-                    + "|" + mailenvio                                      //17-Correo de envio                                                    
-                    + "|"                                                  //Fin Del Registro 
-                    );
+                        "02"                                                   //1-Tipo De Registro
+                        + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                        + "|" + txtRFC.Text.Trim()                                //3-RFC
+                        + "|" + txtCliente.Text.Trim()                         //4-Nombre
+                        + "|"                             //5-Pais
+                        + "|"                           //6-Calle
+                        + "|"                           //7-Numero Exterior
+                        + "|"                          //8-Numero Interior
+                        + "|"                         //9-Colonia
+                        + "|"                       //10-Localidad
+                        + "|"                      //11-Referencia
+                        + "|"                       //12-Municio/Delegacion
+                        + "|"                           //13-EStado
+                        + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
+                        + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                        + "|"                                   //16-Numero de Registro de ID Tributacion 
+                        + "|"                                     //17-Correo de envio                                                    
+                        + "|" + "601"
+                        + "|"      //Fin Del Registro 
+                        );
 
                     escrituraFactura += "\\n02"                                                   //1-Tipo De Registro
-                    + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
-                    + "|" + txtRFC.Text.Trim()                             //3-RFC
-                    + "|" + txtCliente.Text.Trim()                         //4-Nombre
-                    + "|" + txtPaís.Text.Trim()                            //5-Pais
-                    + "|" + txtCalle.Text.Trim()                           //6-Calle
-                    + "|" + txtNoExt.Text.Trim()                           //7-Numero Exterior
-                    + "|" + txtNoInt.Text.Trim()                           //8-Numero Interior
-                    + "|" + txtColonia.Text.Trim()                         //9-Colonia
-                    + "|" + txtLocalidad.Text.Trim()                       //10-Localidad
-                    + "|" + txtReferencia.Text.Trim()                      //11-Referencia
-                    + "|" + txtMunicipio.Text.Trim()                       //12-Municio/Delegacion
-                    + "|" + txtEstado.Text.Trim()                          //13-EStado
-                    + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
-                    + "|" + "" // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
-                    + "|" + numtributacion                                 //16-Numero de Registro de ID Tributacion 
-                    + "|" + mailenvio                                      //17-Correo de envio                                                    
-                    + "|";
+                      + "|" + txtIdCliente.Text.Trim()                       //2-Id Receptor
+                       + "|" + txtRFC.Text.Trim()                                //3-RFC
+                       + "|" + txtCliente.Text.Trim()                         //4-Nombre
+                       + "|"                             //5-Pais
+                       + "|"                           //6-Calle
+                       + "|"                           //7-Numero Exterior
+                       + "|"                          //8-Numero Interior
+                       + "|"                         //9-Colonia
+                       + "|"                       //10-Localidad
+                       + "|"                      //11-Referencia
+                       + "|"                       //12-Municio/Delegacion
+                       + "|"                           //13-EStado
+                       + "|" + txtCP.Text.Trim()                              //14-Codigo Postal
+                       + "|"                                                // paisresidencia                                 //15-Pais de Residecia Fiscal Cuando La Empresa Sea Extrajera
+                       + "|"                                   //16-Numero de Registro de ID Tributacion 
+                       + "|"                                     //17-Correo de envio                                                    
+                       + "|" + "601"
+                       + "|";
 
                 }
 
@@ -2745,33 +3157,36 @@ namespace CARGAR_EXCEL
                 //04 INFORMACION DE LOS CONCEPTOS (1:N)
                 escritor.WriteLine(
                "04"                                                   //1-Tipo De Registro
-               + "|" + consecutivoconcepto.Trim()                            //2-Consecutivo Concepto
-               + "|" + claveproductoservicio.Trim()                          //3-Clave Producto o Servicio SAT                                               
-               + "|" + numidentificacion.Trim()                              //4-Numero Identificacion TDR
-               + "|" + txtCantidad.Text.Trim()                        //5-Cantidad
-               + "|" + claveunidad.Trim()                                    //6-Clave Unidad SAT
-               + "|"                                                  //7-Unidad de Medida
-               + "|" + txtConcepto.Text.Trim()                                //8-Descripcion
-               + "|" + "0"                                  //9-Valor Unitario
-               + "|" + "0"                                        //10-Importe
-               + "|" + descuento.Trim()                                      //11-Descuento                                                  
-                                                                             //12 Importe con iva si el rfc es XAXX010101000 y XEXX010101000 OPCIONAL
-               + "|"                                                  //Fin Del Registro
-                );
+              + "|" + consecutivoconcepto.Trim()                       //2-Id Receptor
+              + "|" + claveproductoservicio.Trim()                                //3-RFC
+              + "|"                          //4-Nombre
+              + "|" + cantidad.Trim()                           //5-Pais
+              + "|" + claveunidad.Trim()                            //6-Calle
+              + "|"                             //7-Numero Exterior
+              + "|" + descripcion.Trim()                            //8-Numero Interior
+              + "|" + valorunitario.Trim()                         //9-Colonia
+              + "|" + importe.Trim()                        //10-Localidad
+              + "|"                        //11-Referencia
+              + "|"                         //12-Municio/Delegacion
+              + "|" + "02"                          //13-EStado
+              + "|"
+              );
+
 
                 escrituraFactura += "\\n04"                                                   //1-Tipo De Registro
-               + "|" + consecutivoconcepto.Trim()                            //2-Consecutivo Concepto
-               + "|" + claveproductoservicio.Trim()                          //3-Clave Producto o Servicio SAT                                               
-               + "|" + numidentificacion.Trim()                             //4-Numero Identificacion TDR
-               + "|" + txtCantidad.Text.Trim()                        //5-Cantidad
-               + "|" + claveunidad.Trim()                                   //6-Clave Unidad SAT
-               + "|"                                                  //7-Unidad de Medida
-               + "|" + txtConcepto.Text.Trim()                                //8-Descripcion
-               + "|" + "0"                                  //9-Valor Unitario
-               + "|" + "0"                                        //10-Importe
-               + "|" + descuento.Trim()                                      //11-Descuento                                                  
-                                                                             //12 Importe con iva si el rfc es XAXX010101000 y XEXX010101000 OPCIONAL
-               + "|";
+                + "|" + consecutivoconcepto.Trim()                       //2-Id Receptor
+              + "|" + claveproductoservicio.Trim()                                //3-RFC
+              + "|"                          //4-Nombre
+              + "|" + cantidad.Trim()                           //5-Pais
+              + "|" + claveunidad.Trim()                            //6-Calle
+              + "|"                             //7-Numero Exterior
+              + "|" + descripcion.Trim()                            //8-Numero Interior
+              + "|" + valorunitario.Trim()                         //9-Colonia
+              + "|" + importe.Trim()                        //10-Localidad
+              + "|"                        //11-Referencia
+              + "|"                         //12-Municio/Delegacion
+              + "|" + "02"                          //13-EStado
+              + "|";
 
                 //----------------------------------------Seccion CPAG20 -------------------------------------------------------------------
 
@@ -3735,7 +4150,7 @@ namespace CARGAR_EXCEL
 
 
         }
-     
+
         protected void btnGenerarTxt_Click(object sender, EventArgs e)
         {
             try
@@ -3844,10 +4259,10 @@ namespace CARGAR_EXCEL
                 txtTipoCobro.CssClass = "readOnlyTextBox";
 
                 generadorTXT();
-                    string msg = "¡Se genero correctamente el TXT!";
-                    ScriptManager.RegisterStartupScript(this, GetType(), "swal", "swal('" + msg + "', 'Success', 'success');setTimeout(function(){window.location.href ='DownloadTxt.aspx'}, 10000)", true);
+                string msg = "¡Se genero correctamente el TXT!";
+                ScriptManager.RegisterStartupScript(this, GetType(), "swal", "swal('" + msg + "', 'Success', 'success');setTimeout(function(){window.location.href ='DownloadTxt.aspx'}, 10000)", true);
 
-                
+
             }
         }
     }
