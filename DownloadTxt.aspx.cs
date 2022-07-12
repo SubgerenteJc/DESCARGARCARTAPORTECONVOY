@@ -40,7 +40,7 @@ namespace CARGAR_EXCEL
         private async Task okTralix()
         {
             //DirectoryInfo files = new DirectoryInfo(@"\\10.223.208.41\inetpub\wwwroot\ComplementoPago\TxtGenerados\Generados\");
-            DirectoryInfo files = new DirectoryInfo(@"C:\CartaPorteCargaMasiva\TralixComplementoPago\CARGAR_EXCEL\TxtGenerados\");
+            DirectoryInfo files = new DirectoryInfo(@"C:\CartaPorteCargaMasiva\ComplementoPagoNuevaVersion\CARGAR_EXCEL\TxtGenerados\");
             FileInfo[] di = files.GetFiles("*.txt").OrderByDescending(p => p.CreationTime).ToArray();
 
             DataTable dt = new DataTable();
