@@ -148,6 +148,32 @@ namespace CARGAR_EXCEL.Models
             }
             return dataTablee;
         }
+        public DataTable getCartasPorte(string factura)
+        {
+            DataTable dataTable = new DataTable();
+            string cadena = @"Data source=172.24.16.112; Initial Catalog=TMWSuite; User ID=sa; Password=tdr9312;Trusted_Connection=false;MultipleActiveResultSets=true";
+            using (SqlConnection connection = new SqlConnection(cadena))
+            {
+                using (SqlCommand selectCommand = new SqlCommand("SELECT * FROM VISTA_Carta_Porte where Folio = @factura", connection))
+                {
+                    selectCommand.CommandType = CommandType.Text;
+                    selectCommand.Parameters.AddWithValue("@factura", (object)factura);
+                    using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(selectCommand))
+                    {
+                        try
+                        {
+                            selectCommand.Connection.Open();
+                            sqlDataAdapter.Fill(dataTable);
+                        }
+                        catch (SqlException ex)
+                        {
+                            string message = ex.Message;
+                        }
+                    }
+                }
+            }
+            return dataTable;
+        }
         public DataTable getFacturasClientes()
         {
             DataTable dataTable = new DataTable();
