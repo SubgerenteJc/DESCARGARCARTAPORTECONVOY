@@ -154,7 +154,7 @@ namespace CARGAR_EXCEL.Models
             string cadena = @"Data source=172.24.16.112; Initial Catalog=TMWSuite; User ID=sa; Password=tdr9312;Trusted_Connection=false;MultipleActiveResultSets=true";
             using (SqlConnection connection = new SqlConnection(cadena))
             {
-                using (SqlCommand selectCommand = new SqlCommand("SELECT * FROM VISTA_Carta_Porte where Folio = @factura", connection))
+                using (SqlCommand selectCommand = new SqlCommand("SELECT * FROM VISTA_Carta_Porte where Folio = @factura and Serie != 'TDRZP'", connection))
                 {
                     selectCommand.CommandType = CommandType.Text;
                     selectCommand.Parameters.AddWithValue("@factura", (object)factura);
